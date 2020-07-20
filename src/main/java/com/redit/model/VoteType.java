@@ -1,6 +1,6 @@
 package com.redit.model;
 
-//import com.programming.techie.springredditclone.exceptions.SpringRedditException;
+import com.redit.exceptions.SpringRedditException;
 
 import java.util.Arrays;
 
@@ -13,12 +13,12 @@ public enum VoteType {
     VoteType(int direction) {
     }
 
-//    public static VoteType lookup(Integer direction) {
-//        return Arrays.stream(VoteType.values())
-//                .filter(value -> value.getDirection().equals(direction))
-//                .findAny()
-//                .orElseThrow(() -> new SpringRedditException("Vote not found"));
-//    }
+    public static VoteType lookup(Integer direction) {
+        return Arrays.stream(VoteType.values())
+                .filter(value -> value.getDirection().equals(direction))
+                .findAny()
+                .orElseThrow(() -> new SpringRedditException("Vote not found"));
+    }
 
     public Integer getDirection() {
         return direction;
