@@ -5,10 +5,16 @@ import java.util.Optional;
 import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.redit.dto.AuthenticationResponce;
+import com.redit.dto.LoginRequest;
 import com.redit.dto.RegisterRequest;
 import com.redit.exceptions.SpringRedditException;
 import com.redit.model.NotificationEmail;
@@ -16,17 +22,21 @@ import com.redit.model.User;
 import com.redit.model.VerificationToken;
 import com.redit.repository.UserRepository;
 import com.redit.repository.VerificationTokenRepository;
+import com.redit.secruity.JwtProvider;
 
 import lombok.AllArgsConstructor;
 
 @Service
 @AllArgsConstructor
+@Transactional
 public class AuthService {
-	//@Autowired//Its good Practice to do in Constractor
 	private final PasswordEncoder passwordEncoder;//BCrypt Encoding
 	private final UserRepository userRepository;
 	private final VerificationTokenRepository verificationTokenRepository;
 	private final MailService mailService;
+	private final AuthenticationManager authenticationManager;
+	private final JwtProvider jwtProvider;
+	
 	@Transactional
 	public void signup(RegisterRequest registerRequest) {
 		User user = new User();
@@ -57,11 +67,20 @@ public class AuthService {
 		verificationToken.orElseThrow(()-> new SpringRedditException("Invalid Token"));
 		EnableUser(verificationToken.get());
 	}
+	@Transactional
 	private void EnableUser(VerificationToken verificationToken) {
 		// TODO Auto-generated method stub
 		String username = verificationToken.getUser().getUsername();
 		User user = userRepository.findByUsername(username).orElseThrow(()-> new SpringRedditException("User Not Found : " + username));
 		user.setEnabled(true);
-		userRepository.save(user);
+		userRepository.save(user);	
+	}
+	public AuthenticationResponce login(LoginRequest loginrequest) {
+		// TODO Auto-generated method stub
+		Authentication authentication = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(
+				loginrequest.getUsername(),loginrequest.getPassword()));
+		SecurityContextHolder.getContext().setAuthentication(authentication);
+		String token = jwtProvider.genarateToken(authentication);
+		return new AuthenticationResponce(token, loginrequest.getUsername());
 	}
 }

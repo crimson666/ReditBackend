@@ -13,6 +13,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.redit.model.User;
 import com.redit.repository.UserRepository;
+import static java.util.Collections.singletonList;
 
 import lombok.AllArgsConstructor;
 
@@ -23,10 +24,12 @@ public class userDetailsServiceImpl implements UserDetailsService{
 
 	@Override
 	@Transactional(readOnly = true)
-	public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
+	public UserDetails loadUserByUsername(String username) {
 		Optional<User> userOptional = userRepository.findByUsername(username);
 		User user= userOptional.orElseThrow(()-> new UsernameNotFoundException("No user found :" + username ));
-		return new org.springframework.security.core.userdetails.User(user.getUsername(), user.getPassword(),user.isEnabled(),true,true,true,getAuthority("USER"));
+		return new org.springframework.security.core.userdetails.User(
+				user.getUsername(), user.getPassword(),user.isEnabled(),
+				true,true,true,getAuthority("USER"));
 	}
 
 	private Collection<? extends GrantedAuthority> getAuthority(String role) {

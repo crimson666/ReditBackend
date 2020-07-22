@@ -8,6 +8,8 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.redit.dto.AuthenticationResponce;
+import com.redit.dto.LoginRequest;
 import com.redit.dto.RegisterRequest;
 import com.redit.service.AuthService;
 
@@ -29,5 +31,9 @@ public class AuthController {
 	public ResponseEntity<String> verifyAccount(@PathVariable String token){
 		authService.verifyAccount(token);
 		return new ResponseEntity<>("User Activated Successfully", HttpStatus.OK);
+	}
+	@PostMapping("/login")
+	public AuthenticationResponce login(@RequestBody LoginRequest loginrequest) {
+		return authService.login(loginrequest);
 	}
 }
