@@ -4,6 +4,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.redit.dto.SubreditDto;
+import com.redit.exceptions.SpringRedditException;
 import com.redit.mapper.SubreditMapper;
 import com.redit.model.Subreddit;
 import com.redit.repository.SubredditRepository;
@@ -24,6 +25,7 @@ public class SubreditService {
 	
 	@Transactional
 	public SubreditDto save(SubreditDto SubreditDto) {
+		
 		Subreddit save = subredditRepository.save(subreditMapper.mapDtoToSubreddit(SubreditDto));
 		SubreditDto.setId(save.getId());
 		return SubreditDto;
@@ -46,5 +48,9 @@ public class SubreditService {
 //				.numberOfPost(subreddit.getPosts().size())
 //				.build();
 //	}
+	public SubreditDto getSubredit(Long id) {
+		Subreddit subreddit = subredditRepository.findById(id).orElseThrow(()-> new SpringRedditException("No Such Redit Post Found"));
+		return subreditMapper.mapSubredditToDto(subreddit);
+	}
 
 }
