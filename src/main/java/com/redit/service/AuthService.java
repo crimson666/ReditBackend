@@ -72,6 +72,7 @@ public class AuthService {
 		verificationToken.orElseThrow(()-> new SpringRedditException("Invalid Token"));
 		EnableUser(verificationToken.get());
 	}
+	
 	@Transactional
 	private void EnableUser(VerificationToken verificationToken) {
 		// TODO Auto-generated method stub

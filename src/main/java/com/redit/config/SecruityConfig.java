@@ -23,6 +23,7 @@ public class SecruityConfig extends WebSecurityConfigurerAdapter {
 	private final UserDetailsService userDetailsService;
 	private final JwtAuthenticationFilter jwtAuthenticationFilter;
 	
+	@Override
 	public void configure(HttpSecurity httpSecruity) throws Exception {
 		
 		//To Disable csrf attack protection and ant matcher is for 
@@ -34,19 +35,32 @@ public class SecruityConfig extends WebSecurityConfigurerAdapter {
 							.permitAll()
 							.antMatchers(HttpMethod.GET,"/api/subredit")
 							.permitAll()
+							.antMatchers(HttpMethod.GET, "/api/posts/")
+			                .permitAll()
+			                .antMatchers(HttpMethod.GET, "/api/posts/**")
+			                .permitAll()
+							.antMatchers("/v2/api-docs").permitAll()
+							.antMatchers("/configuration/ui").permitAll()
+							.antMatchers("/swagger-resources/**").permitAll()
+							.antMatchers("/configuration/security").permitAll()
+							.antMatchers("/swagger-ui.html").permitAll()
+							.antMatchers("/webjars/**").permitAll()
 							.anyRequest()
 							.authenticated();
 		httpSecruity.addFilterBefore(jwtAuthenticationFilter,UsernamePasswordAuthenticationFilter.class);
 	}
+	
 	@Autowired
 	public void confuigerGlobal(AuthenticationManagerBuilder authenticationManagerBuilder) throws Exception {
 		authenticationManagerBuilder.userDetailsService(userDetailsService)
 									.passwordEncoder(passwordEncoder());
 	}
+	
 	@Bean
 	PasswordEncoder passwordEncoder() {
 		return new BCryptPasswordEncoder();
 	}
+	
 	@Bean(name = BeanIds.AUTHENTICATION_MANAGER)
 	@Override
 	public AuthenticationManager authenticationManagerBean() throws Exception {
